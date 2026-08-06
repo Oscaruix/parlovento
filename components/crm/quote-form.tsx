@@ -1,0 +1,10 @@
+"use client"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle,DialogTrigger } from "@/components/ui/dialog"
+import { Field,FieldGroup,FieldLabel } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+export function QuoteForm(){const[open,setOpen]=useState(false);const router=useRouter();async function submit(formData:FormData){const res=await fetch("/api/quotes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.fromEntries(formData))});if(res.ok){toast.success("Cotización creada");setOpen(false);router.refresh()}else toast.error("No se pudo crear la cotización")}return <Dialog open={open} onOpenChange={setOpen}><DialogTrigger asChild><Button>Nueva cotización</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle className="font-serif text-3xl">Nueva cotización</DialogTitle><DialogDescription>Crea un borrador inicial. Podrás agregar más conceptos después.</DialogDescription></DialogHeader><form action={submit}><FieldGroup><div className="grid gap-4 sm:grid-cols-2"><Field><FieldLabel htmlFor="name">Cliente</FieldLabel><Input id="name" name="name" required/></Field><Field><FieldLabel htmlFor="phone">Teléfono</FieldLabel><Input id="phone" name="phone" required/></Field></div><div className="grid gap-4 sm:grid-cols-2"><Field><FieldLabel htmlFor="eventDate">Fecha del evento</FieldLabel><Input id="eventDate" name="eventDate" type="date"/></Field><Field><FieldLabel htmlFor="total">Total estimado (MXN)</FieldLabel><Input id="total" name="total" type="number" min="0" step="1" required/></Field></div><Field><FieldLabel htmlFor="concept">Concepto principal</FieldLabel><Input id="concept" name="concept" placeholder="Renta de jardín y palapa" required/></Field><Field><FieldLabel htmlFor="notes">Notas</FieldLabel><Textarea id="notes" name="notes"/></Field><Button>Crear borrador</Button></FieldGroup></form></DialogContent></Dialog>}
