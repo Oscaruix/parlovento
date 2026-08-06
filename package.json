@@ -2,6 +2,7 @@
   "name": "parlovento",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@10.17.1",
   "scripts": {
     "dev": "next dev",
@@ -33,9 +34,10 @@
     "lucide-react": "latest",
     "next": "16.0.10",
     "next-themes": "latest",
+    "postgres": "3.4.7",
     "radix-ui": "latest",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
     "recharts": "2.15.4",
     "sonner": "latest",
     "swr": "latest",
@@ -47,10 +49,10 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "eslint": "latest",
+    "eslint": "9.39.2",
     "eslint-config-next": "16.0.10",
     "tailwindcss": "latest",
     "tw-animate-css": "latest",
-    "typescript": "latest"
+    "typescript": "5.9.3"
   }
 }

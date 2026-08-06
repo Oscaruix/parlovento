@@ -1,4 +1,36 @@
+import { createElement } from "react"
 import { renderToBuffer } from "@react-pdf/renderer"
 import { QuoteDocument } from "@/components/crm/quote-document"
 import { createClient } from "@/lib/supabase/server"
-export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){const supabase=await createClient();const{data:{user}}=await supabase.auth.getUser();if(!user)return Response.json({error:"No autorizado"},{status:401});const{id}=await params;const[{data:quote},{data:items}]=await Promise.all([supabase.from("quotes").select("folio,event_date,total_cents,deposit_cents,valid_until,notes,customers(name,phone,email)").eq("id",id).single(),supabase.from("quote_items").select("description,quantity,unit_price_cents,total_cents").eq("quote_id",id)]);if(!quote)return Response.json({error:"No encontrada"},{status:404});const normalized={...quote,customers:Array.isArray(quote.customers)?quote.customers[0]??null:quote.customers};const buffer=await renderToBuffer(<QuoteDocument quote={normalized} items={items??[]}/>);return new Response(new Uint8Array(buffer),{headers:{"Content-Type":"application/pdf","Content-Disposition":`attachment; filename="${quote.folio}.pdf"`}})}
+
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return Response.json({ error: "No autorizado" }, { status: 401 })
+
+  const { id } = await params
+  const [{ data: quote }, { data: items }] = await Promise.all([
+    supabase.from("quotes").select("folio,event_date,total_cents,deposit_cents,valid_until,notes,customers(name,phone,email)").eq("id", id).single(),
+    supabase.from("quote_items").select("description,quantity,unit_price_cents,total_cents").eq("quote_id", id),
+  ])
+  if (!quote) return Response.json({ error: "No encontrada" }, { status: 404 })
+
+  const normalized = {
+    ...quote,
+    customers: Array.isArray(quote.customers) ? quote.customers[0] ?? null : quote.customers,
+  }
+  const document = createElement(QuoteDocument, { quote: normalized, items: items ?? [] })
+  const buffer = await renderToBuffer(
+    document as unknown as Parameters<typeof renderToBuffer>[0],
+  )
+  return new Response(new Uint8Array(buffer), {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `attachment; filename="${quote.folio}.pdf"`,
+    },
+  })
+}
+
