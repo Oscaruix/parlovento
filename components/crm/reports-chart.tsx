@@ -1,0 +1,5 @@
+"use client"
+import { Area,AreaChart,CartesianGrid,XAxis,YAxis } from "recharts"
+import { ChartContainer,ChartTooltip,ChartTooltipContent,type ChartConfig } from "@/components/ui/chart"
+const config={solicitudes:{label:"Solicitudes",color:"var(--chart-1)"},cotizaciones:{label:"Cotizaciones",color:"var(--chart-2)"}} satisfies ChartConfig
+export function ReportsChart({data}:{data:{month:string;solicitudes:number;cotizaciones:number}[]}){return <ChartContainer config={config} className="h-72 w-full"><AreaChart data={data} margin={{left:-20,right:8,top:8}}><CartesianGrid vertical={false}/><XAxis dataKey="month" tickLine={false} axisLine={false}/><YAxis allowDecimals={false} tickLine={false} axisLine={false}/><ChartTooltip content={<ChartTooltipContent/>}/><Area type="monotone" dataKey="solicitudes" stroke="var(--color-solicitudes)" fill="var(--color-solicitudes)" fillOpacity={0.18} strokeWidth={2}/><Area type="monotone" dataKey="cotizaciones" stroke="var(--color-cotizaciones)" fill="var(--color-cotizaciones)" fillOpacity={0.12} strokeWidth={2}/></AreaChart></ChartContainer>}

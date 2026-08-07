@@ -1,0 +1,4 @@
+import { z } from "zod"
+import { createClient } from "@/lib/supabase/server"
+const schema=z.object({name:z.string().trim().min(2).max(120),capacity:z.coerce.number().int().min(1).max(1000),address:z.string().trim().max(250),phone:z.string().trim().max(30),email:z.string().trim().email().optional().or(z.literal(""))})
+export async function PATCH(request:Request){const supabase=await createClient();const{data:{user}}=await supabase.auth.getUser();if(!user)return Response.json({error:"No autorizado"},{status:401});const parsed=schema.safeParse(await request.json());if(!parsed.success)return Response.json({error:"Inválido"},{status:400});const{error}=await supabase.from("settings").upsert({key:"business",value:{...parsed.data,demoPricing:true}},{onConflict:"key"});return error?Response.json({error:"No se pudo guardar"},{status:500}):Response.json({ok:true})}
