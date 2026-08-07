@@ -34,7 +34,6 @@
     "lucide-react": "latest",
     "next": "16.0.10",
     "next-themes": "latest",
-    "postgres": "3.4.7",
     "radix-ui": "latest",
     "react": "19.2.1",
     "react-dom": "19.2.1",
