@@ -13,17 +13,28 @@ const fallbackFaqs: PublicFaq[] = [
   { id: "hold", question: "¿Cómo aparto una fecha?", answer: "La fecha se confirma una vez aceptada la cotización y registrado el anticipo acordado." },
 ]
 
+async function loadPublicContent() {
+  const supabase = await createClient()
+  return Promise.all([
+    supabase.from("packages").select("id,name,description,featured,inclusions").eq("active", true).order("featured", { ascending: false }),
+    supabase.from("faqs").select("id,question,answer").eq("active", true).order("sort_order"),
+  ])
+}
+
 export default async function HomePage() {
   let packages = fallbackPackages
   let faqs = fallbackFaqs
+
   try {
-    const supabase = await createClient()
-    const [packageResult, faqResult] = await Promise.all([
-      supabase.from("packages").select("id,name,description,featured,inclusions").eq("active", true).order("featured", { ascending: false }),
-      supabase.from("faqs").select("id,question,answer").eq("active", true).order("sort_order"),
-    ])
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Public content request timed out")), 1200),
+    )
+    const [packageResult, faqResult] = await Promise.race([loadPublicContent(), timeout])
     if (packageResult.data?.length) packages = packageResult.data as PublicPackage[]
     if (faqResult.data?.length) faqs = faqResult.data as PublicFaq[]
-  } catch {}
+  } catch {
+    // Keep the launch-ready catalog visible while the connected database is unavailable.
+  }
+
   return <PublicHome packages={packages} faqs={faqs} />
 }
